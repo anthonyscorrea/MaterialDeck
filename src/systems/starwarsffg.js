@@ -77,7 +77,6 @@ export class starwarsffg{
             {value:'DefenseRanged', name:'Defense Ranged'},
             {value:'Encumbrance', name:'Encum'},
             {value:'ForcePool', name:'Force Pool'},
-            // {value:'Soak', name:'Soak'},
             {value:'Strain', name:'Strain'}
         ]
     }
@@ -270,8 +269,8 @@ export class starwarsffg{
      */
     getConditionIcon(condition) {
         if (condition == undefined) condition = 'removeAll';
-        if (condition == 'removeAll') return;
-        else return;
+        if (condition == 'removeAll') return window.CONFIG.controlIcons.effects;
+        else return CONFIG.statusEffects.find(e => e.id === condition).icon;
     }
 
     /**
@@ -282,7 +281,7 @@ export class starwarsffg{
      */
     getConditionActive(token,condition) {
         if (condition == undefined) condition = 'removeAll';
-        return;
+        return token.actor.effects.find(e => e.isTemporary === condition) != undefined;
     }
 
     /**
@@ -292,7 +291,15 @@ export class starwarsffg{
      */
     async toggleCondition(token,condition) {
         if (condition == undefined) condition = 'removeAll';
-
+        if (condition == 'removeAll'){
+            for( let effect of token.actor.effects)
+                await effect.delete();
+        }
+        else {
+            const effect = CONFIG.statusEffects.find(e => e.id === condition);
+            await token.toggleEffect(effect);
+        }
+        return true;
     }
 
     /**
@@ -437,9 +444,9 @@ export class starwarsffg{
         // return proficiencyColors?.[profLevel];
     }
 
-    getConditionList(token,level) {
+    getConditionList() {
         let conditions = [];
-        // for (let c of CONFIG.statusEffects) conditions.push({value:c.id, name:game.i18n.localize(c.label)});
+        for (let c of CONFIG.statusEffects) conditions.push({value:c.id, name:game.i18n.localize(c.label)});
         return conditions;
     }
 
